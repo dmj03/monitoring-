@@ -44,7 +44,7 @@ import yaml  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
 from backend.ai import AIAnalyst, build_summary_input, check_output  # noqa: E402
-from backend.ai.analyst import API_KEY_ENV, MODEL_ENV  # noqa: E402
+from backend.ai.analyst import API_KEY_ENV, LEGACY_MODEL_ENV, MODEL_ENV  # noqa: E402
 from backend.api import app  # noqa: E402
 from backend.paths import DATASET_PATH, KB_DIR, PROJECT_ROOT  # noqa: E402
 
@@ -830,6 +830,13 @@ def main() -> int:
         a = AIAnalyst.from_env(outcomes, environ={API_KEY_ENV: "k"})
         check("no model configured -> unavailable", not a.available
               and MODEL_ENV in a.unavailable_reason)
+        a = AIAnalyst.from_env(outcomes, environ={API_KEY_ENV: "k", MODEL_ENV: " m-new  "})
+        check("model read from LLM_MODEL, trimmed", a.model == "m-new")
+        a = AIAnalyst.from_env(outcomes, environ={API_KEY_ENV: "k", LEGACY_MODEL_ENV: "m-old"})
+        check("OPENAI_MODEL still read when LLM_MODEL is unset", a.model == "m-old")
+        a = AIAnalyst.from_env(outcomes, environ={API_KEY_ENV: "k", MODEL_ENV: "m-new",
+                                                  LEGACY_MODEL_ENV: "m-old"})
+        check("LLM_MODEL wins over OPENAI_MODEL", a.model == "m-new")
         app.state.ai_analyst = AIAnalyst.from_env(outcomes, environ={})
         r = client.post("/investigate/summary", json=body)
         s = r.json()["ai_summary"]
@@ -911,7 +918,7 @@ def main() -> int:
     ex = (PROJECT_ROOT / ".env.example").read_text()
     check(".env.example has an empty key and names the model",
           re.search(r"^OPENAI_API_KEY=\s*$", ex, re.M) is not None
-          and re.search(r"^OPENAI_MODEL=\S+", ex, re.M) is not None)
+          and re.search(r"^LLM_MODEL=\S+", ex, re.M) is not None)
 
     analyst_src = (PROJECT_ROOT / "backend" / "ai" / "analyst.py").read_text(encoding="utf-8")
     pbs = yaml.safe_load((KB_DIR / "playbooks.yaml").read_text())["playbooks"]

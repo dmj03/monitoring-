@@ -7,7 +7,7 @@ Position in the flow:
 
     alert -> InvestigationEngine.investigate() -> EvidencePack
           -> build_summary_input()  (a subset of build_llm_input())
-          -> model                  (OpenAI, model name from OPENAI_MODEL)
+          -> model                  (OpenAI, model name from LLM_MODEL, else OPENAI_MODEL)
           -> check_output()         (deterministic grounding checks)
           -> AI analyst summary     -> human analyst
 
@@ -45,7 +45,8 @@ from backend.tools.datastore import MISSING
 log = logging.getLogger("uc3.ai")
 
 API_KEY_ENV = "OPENAI_API_KEY"
-MODEL_ENV = "OPENAI_MODEL"
+MODEL_ENV = "LLM_MODEL"
+LEGACY_MODEL_ENV = "OPENAI_MODEL"  # still read when LLM_MODEL is not set
 REQUEST_TIMEOUT_SECONDS = 60.0
 
 STATUS_GENERATED = "generated"
@@ -856,7 +857,8 @@ class AIAnalyst:
     def from_env(cls, outcome_names: list[str], environ: dict | None = None) -> "AIAnalyst":
         env = os.environ if environ is None else environ
         key = (env.get(API_KEY_ENV) or "").strip()
-        model = (env.get(MODEL_ENV) or "").strip() or None
+        model = ((env.get(MODEL_ENV) or "").strip()
+                 or (env.get(LEGACY_MODEL_ENV) or "").strip() or None)
         if not key:
             return cls(None, model, outcome_names, f"{API_KEY_ENV} is not configured")
         if not model:

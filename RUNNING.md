@@ -60,7 +60,7 @@ curl http://127.0.0.1:8000/health
 Interactive API docs: <http://127.0.0.1:8000/docs>
 
 **Optional — AI analyst summary.** Copy `.env.example` to `.env` in the project
-root and set `OPENAI_API_KEY`. `OPENAI_MODEL` is read from the same file
+root and set `OPENAI_API_KEY`. `LLM_MODEL` is read from the same file
 (`gpt-5-mini` in the example). Restart uvicorn after editing `.env`. Without a
 key the "Generate AI summary" button reports that the AI summary is unavailable;
 the investigation itself is unaffected. `.env` is gitignored — never commit it.

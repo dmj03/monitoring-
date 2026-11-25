@@ -113,7 +113,7 @@ be read back.
 ```
 
 There are exactly two LLM calls, both in `backend/ai/`, sharing one OpenAI client
-and model (`OPENAI_MODEL`):
+and model (`LLM_MODEL`, or `OPENAI_MODEL` if that is not set):
 
 - `POST /investigate/summary` (`analyst.py`) explains an alert's deterministic
   evidence pack; every statement cites evidence keys.

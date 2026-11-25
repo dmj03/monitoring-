@@ -114,7 +114,7 @@ class AISummaryOut(BaseModel):
     label: Literal["AI-generated"] = "AI-generated"
     generated_by: Literal["llm"] | None = Field(
         None, description='"llm" when a model produced this summary; null otherwise')
-    model: str | None = Field(None, description="value of OPENAI_MODEL")
+    model: str | None = Field(None, description="value of LLM_MODEL (or OPENAI_MODEL)")
     summary: str | None = Field(None, description="the narrative: summary_sentences joined")
     summary_evidence_keys: list[str] = []
     summary_sentences: list[AIStatementOut] = Field(

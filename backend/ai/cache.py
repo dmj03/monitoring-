@@ -6,7 +6,7 @@ failed, timed-out and rejected results never are, so they are always retried.
 
 An entry is keyed by fingerprint(): a SHA-256 of the summary kind, the prompt
 text, the output schema, the model name and the exact model input. Any change
-to the evidence or cluster data, the prompt, the schema or OPENAI_MODEL gives a
+to the evidence or cluster data, the prompt, the schema or the model gives a
 different key, so a cached result can never be served for different input.
 
 Callers re-run the current grounding checks on a cached output before using it

@@ -2,7 +2,7 @@
 AI cluster summary.
 
     deterministic clustering -> validated cluster result -> build_cluster_input()
-        -> model (the same OpenAI client and OPENAI_MODEL as the alert analyst)
+        -> model (the same OpenAI client and model as the alert analyst)
         -> check_cluster_output() -> AI cluster summary -> analyst
 
 The model explains why the deterministic cluster engine grouped these alerts.

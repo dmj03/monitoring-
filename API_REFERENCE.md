@@ -264,7 +264,7 @@ the current grounding checks. Unavailable, failed and rejected results are never
 cached. The cache is `data/ai_cache.json` (or `UC3_AI_CACHE_PATH`).
 
 AI analyst summary: an AI-generated explanation of one investigation's evidence.
-The only endpoint that calls a language model (OpenAI; model from `OPENAI_MODEL`).
+The only endpoint that calls a language model (OpenAI; model from `LLM_MODEL`, or `OPENAI_MODEL` if that is not set).
 
 **Request body** — identical to `POST /investigate`: `{"alert": {...}}`.
 
@@ -318,7 +318,7 @@ What happens:
 | `ai_summary.status` | Meaning | Content fields |
 |---|---|---|
 | `generated` | the model answered and every check passed | filled |
-| `unavailable` | `OPENAI_API_KEY` or `OPENAI_MODEL` is not configured | empty; `reason` says which |
+| `unavailable` | `OPENAI_API_KEY` or `LLM_MODEL` is not configured | empty; `reason` says which |
 | `error` | API failure, timeout, malformed output, or the answer failed a check | empty; `reason` says why |
 
 - `summary` is a short narrative (alert type, observed values, enrichment,

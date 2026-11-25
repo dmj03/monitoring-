@@ -78,7 +78,7 @@ async def lifespan(app: FastAPI):
     app.state.playbook_count = len(pb_doc["playbooks"])
     app.state.cluster_type_count = len(cfg["clusters"])
 
-    # The AI analyst reads OPENAI_API_KEY and OPENAI_MODEL. A project-root .env
+    # The AI analyst reads OPENAI_API_KEY and LLM_MODEL (or OPENAI_MODEL). A project-root .env
     # is loaded if present; real environment variables take precedence. With no
     # key the analyst reports "unavailable" and everything else works as before.
     try:
