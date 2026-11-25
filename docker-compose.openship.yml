@@ -1,0 +1,15 @@
+# Openship deploy: one container (nginx :80 serving the Vite build, /api/* -> FastAPI with the /api prefix stripped).
+services:
+  app:
+    build: .
+    ports:
+      - "80"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LLM_MODEL: ${LLM_MODEL:-gpt-6-luna}
+      UC3_AI_CACHE_PATH: /data/ai_cache.json
+    volumes:
+      - uc3-data:/data
+    restart: unless-stopped
+volumes:
+  uc3-data:
