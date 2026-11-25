@@ -87,6 +87,10 @@ async def lifespan(app: FastAPI):
     except ImportError:
         pass
     app.state.ai_analyst = AIAnalyst.from_env(outcome_names=cfg["investigation_outcomes"])
+    # Adding alerts (POST /alerts) is frozen unless UC3_ALERT_CREATION is switched
+    # on, in the environment or .env. /health reports it so the UI can follow.
+    app.state.alert_creation_enabled = (
+        os.environ.get("UC3_ALERT_CREATION", "").strip().lower() in ("1", "true", "yes", "on"))
     # Accepted AI summaries, cached in their own file beside the dataset in use.
     app.state.ai_cache = AICache(
         Path(os.environ.get("UC3_AI_CACHE_PATH", dataset_path.parent / "ai_cache.json")))

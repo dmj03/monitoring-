@@ -128,6 +128,8 @@ export interface Health {
   kb_version: string;
   playbooks: number;
   cluster_types: number;
+  /** POST /alerts accepts new alerts. Off unless UC3_ALERT_CREATION is switched on. */
+  alert_creation?: boolean;
 }
 
 // GET /routing and PUT /alerts/{alert_id}/routing. The analyst's decision,

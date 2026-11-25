@@ -50,7 +50,14 @@ python backend\tests\api\test_routing.py
 python backend\tests\api\test_cluster_routing.py
 python backend\tests\api\test_ai_cache.py
 python backend\tests\api\test_alert_form.py
+python backend\tests\api\test_alert_freeze.py
 ```
+
+Adding alerts is frozen by default (`UC3_ALERT_CREATION` off). The suites that
+add alerts switch it on for themselves; `test_alert_freeze.py` (**12 passed**)
+checks the frozen default: `POST /alerts` is 403 before any validation, the
+dataset is unchanged, `/health` reports `alert_creation: false`, and switching
+it on is honoured.
 
 | Suite | Result | What it proves |
 |---|---|---|

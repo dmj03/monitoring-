@@ -33,6 +33,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+os.environ["UC3_ALERT_CREATION"] = "on"  # these tests add alerts; creation is frozen by default
 
 from fastapi.testclient import TestClient  # noqa: E402
 

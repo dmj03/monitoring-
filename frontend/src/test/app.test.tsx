@@ -323,6 +323,7 @@ describe("add alert", () => {
   async function openForm(post: () => [number, unknown] = () => [201, alert("ALRT-0091")]) {
     let created = false;
     mockFetch((url, init) => {
+      if (url.includes("/health")) return [200, { status: "ok", alert_creation: true }];
       if (url.includes("/alerts/form-options")) return [200, FORM_OPTIONS];
       if (init?.method === "POST" && url.includes("/alerts")) {
         const r = post();
@@ -337,11 +338,32 @@ describe("add alert", () => {
       </MemoryRouter>,
     );
     await screen.findByText("No alerts found");
-    await userEvent.click(screen.getByRole("button", { name: /Add alert/ }));
+    const add = screen.getByRole("button", { name: /Add alert/ });
+    await waitFor(() => expect(add).toBeEnabled());
+    await userEvent.click(add);
     const modal = within(screen.getByRole("dialog"));
     await waitFor(() => expect((modal.getByLabelText("Alert ID") as HTMLInputElement).value).toBe("ALRT-0091"));
     return modal;
   }
+
+  it("is frozen unless the API reports alert creation is on", async () => {
+    mockFetch((url) => {
+      if (url.includes("/health")) return [200, { status: "ok", alert_creation: false }];
+      return [200, listBody([])];
+    });
+    render(
+      <MemoryRouter>
+        <Alerts />
+      </MemoryRouter>,
+    );
+    await screen.findByText("No alerts found");
+    await waitFor(() => expect(calls.some((c) => c.url.includes("/health"))).toBe(true));
+    const add = screen.getByRole("button", { name: /Add alert/ });
+    expect(add).toBeDisabled();
+    expect(add.getAttribute("title")).toBe("Adding alerts is paused in this build");
+    await userEvent.click(add);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
 
   async function pick(modal: ReturnType<typeof within>, label: string, option: RegExp, search?: string) {
     await userEvent.click(modal.getByRole("button", { name: label }));
@@ -437,7 +459,11 @@ describe("add alert", () => {
       vi.fn(async (url: string, init?: RequestInit) => {
         calls.push({ url, init });
         if (url.includes("/alerts/form-options")) await gate;
-        const body = url.includes("/alerts/form-options") ? FORM_OPTIONS : listBody([], 0);
+        const body = url.includes("/health")
+          ? { status: "ok", alert_creation: true }
+          : url.includes("/alerts/form-options")
+            ? FORM_OPTIONS
+            : listBody([], 0);
         return { ok: true, status: 200, json: async () => body } as Response;
       }),
     );
@@ -447,7 +473,9 @@ describe("add alert", () => {
       </MemoryRouter>,
     );
     await screen.findByText("No alerts found");
-    await userEvent.click(screen.getByRole("button", { name: /Add alert/ }));
+    const add = screen.getByRole("button", { name: /Add alert/ });
+    await waitFor(() => expect(add).toBeEnabled());
+    await userEvent.click(add);
     const modal = within(screen.getByRole("dialog"));
     await userEvent.type(modal.getByLabelText("Alert ID"), "ALRT-7777");
     release();

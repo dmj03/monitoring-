@@ -27,6 +27,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+os.environ["UC3_ALERT_CREATION"] = "on"  # these tests add alerts; creation is frozen by default
 
 TMP = Path(tempfile.mkdtemp(prefix="uc3-cluster-routing-"))
 os.environ["UC3_ROUTING_PATH"] = str(TMP / "routing.json")

@@ -1080,24 +1080,6 @@
    "cluster_ref": null,
    "_category_intent": "repeated_failed_transaction_or_topup_pattern",
    "_tag": "singleton"
-  },
-  {
-   "alert_id": "ALRT-0091",
-   "rule_id": "TM-TOP-021",
-   "customer_ref": "CUST-0102",
-   "programme_ref": "P001",
-   "created_at": "2026-10-05T10:25:00Z",
-   "shared_match_key": null,
-   "cluster_ref": null
-  },
-  {
-   "alert_id": "ALRT-0092",
-   "rule_id": "CP-LINK-071",
-   "customer_ref": "CUST-0201",
-   "programme_ref": "P002",
-   "created_at": "2026-10-05T11:59:00Z",
-   "shared_match_key": null,
-   "cluster_ref": null
   }
  ],
  "customers": {

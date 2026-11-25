@@ -162,6 +162,7 @@ class HealthOut(BaseModel):
     kb_version: str
     playbooks: int
     cluster_types: int
+    alert_creation: bool = Field(description="whether POST /alerts accepts new alerts (UC3_ALERT_CREATION)")
 
 
 class ErrorOut(BaseModel):

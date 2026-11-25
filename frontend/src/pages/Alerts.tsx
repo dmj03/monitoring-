@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listAlerts, type AlertQuery } from "../api/alerts";
+import { getHealth } from "../api/health";
 import { AddAlertModal } from "../components/AddAlertModal";
 import { Empty, ErrorBox, Loading } from "../components/ui";
 import { clusterOf, routingState, useClusters, useInvestigations, useRouting } from "../lib/hooks";
@@ -107,6 +108,18 @@ export default function Alerts() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [modal, setModal] = useState(false);
+  // Adding alerts is frozen unless the backend says otherwise; until /health
+  // answers (or if it fails) the button stays disabled.
+  const [canAdd, setCanAdd] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    getHealth()
+      .then((h) => alive && setCanAdd(h.alert_creation === true))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
   const [created, setCreated] = useState<Alert | null>(null);
   const [refresh, setRefresh] = useState(0);
   const clusters = useClusters(refresh);
@@ -229,7 +242,12 @@ export default function Alerts() {
             investigation and the AI analyst summary.
           </p>
         </div>
-        <button className="btn btn-p" onClick={() => setModal(true)}>
+        <button
+          className="btn btn-p"
+          onClick={() => setModal(true)}
+          disabled={!canAdd}
+          title={canAdd ? undefined : "Adding alerts is paused in this build"}
+        >
           + Add alert
         </button>
       </div>

@@ -109,6 +109,7 @@ def health(request: Request) -> HealthOut:
         kb_version=s.kb_version,
         playbooks=s.playbook_count,
         cluster_types=s.cluster_type_count,
+        alert_creation=s.alert_creation_enabled,
     )
 
 
@@ -378,6 +379,7 @@ def list_clusters(
 @router.post("/alerts", response_model=AlertOut, status_code=201, tags=["alerts"])
 def create_alert(
     body: AlertCreate,
+    request: Request,
     engine: InvestigationEngine = Depends(get_investigation_engine),
     store: DataStore = Depends(get_datastore),
 ) -> AlertOut:
@@ -404,7 +406,12 @@ def create_alert(
 
     An alert_id that is already used is 409 whatever else is wrong, checked
     first here and again inside add_alert, which remains the final authority.
+
+    While alert creation is frozen (UC3_ALERT_CREATION not switched on) every
+    request is 403 before anything is validated, and the dataset is untouched.
     """
+    if not request.app.state.alert_creation_enabled:
+        raise HTTPException(status_code=403, detail="Adding alerts is paused in this build.")
     duplicate = HTTPException(
         status_code=409,
         detail=f"alert_id '{body.alert_id}' already exists; "
