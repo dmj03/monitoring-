@@ -1,0 +1,181 @@
+# Tool registry for the UC3 investigation layer.
+#
+# These are the ONLY data-access paths available to an investigation. The LLM
+# does not choose among them: a playbook names the tool and field for each
+# evidence key, and the executor calls them. This is what makes a MISSING
+# result a fact about the data rather than an artefact of model behaviour.
+#
+# Contract for every tool:
+#   - returns a flat record of the declared fields
+#   - a field that has no value comes back as MISSING, never as an error
+#   - a tool whose subject does not exist returns all fields MISSING
+#   - calls are deduplicated by (tool, resolved args) within one investigation
+#
+# `args` declare where each argument comes from. `alert.<field>` is resolved
+# from the alert record; `const:<n>` is a literal supplied by the playbook.
+
+version: kb-tools-0.1.0
+
+tools:
+
+  get_customer:
+    description: Customer / business profile and verification status.
+    args: [customer_ref]
+    returns:
+      - customer_ref
+      - business_name_placeholder
+      - entity_type
+      - onboarding_date
+      - country
+      - industry_segment
+      - programme_ref
+      - kyb_status
+      - kyc_status
+      - beneficial_owner_status
+      - source_of_funds
+      - risk_rating
+      - previous_alert_count
+      - open_case_count
+      - last_review_date
+
+  get_programme:
+    description: Programme / partner context and programme-level baselines.
+    args: [programme_ref]
+    returns:
+      - programme_ref
+      - programme_name_placeholder
+      - partner_type
+      - primary_jurisdiction
+      - active_customer_count
+      - programme_transaction_baseline
+      - programme_topup_baseline
+      - monitored_merchant_categories
+      - high_risk_jurisdictions
+
+  get_transaction_summary:
+    description: >
+      Aggregate transaction activity over a window. The summary grain — one
+      row per customer per window — is what the evidence pack shows.
+    args: [customer_ref, window_hours]
+    returns:
+      - customer_ref
+      - window_hours
+      - transaction_count
+      - customer_transaction_baseline
+      - total_amount
+      - average_amount
+      - declined_transaction_count
+      - failed_transaction_count
+      - distinct_merchant_category_count
+      - top_merchant_category
+      - monitored_mcc_transaction_count
+      - distinct_country_count
+      - top_country_exposure
+      - high_risk_country_transaction_count
+      - card_present_count
+      - card_not_present_count
+      - unusual_velocity_flag
+
+  get_transactions:
+    description: >
+      Individual transaction records for drill-down. The hybrid grain: summary
+      drives the investigation, records back it up in the UI.
+    args: [customer_ref, window_hours, limit]
+    returns:
+      - transaction_id
+      - customer_ref
+      - programme_ref
+      - timestamp
+      - transaction_type
+      - amount
+      - currency
+      - merchant_category
+      - counterparty_ref
+      - country
+      - channel
+      - transaction_status
+
+  get_topup_summary:
+    description: Aggregate top-up activity and any customer-impacting status.
+    args: [customer_ref, window_hours]
+    returns:
+      - customer_ref
+      - window_hours
+      - topup_count
+      - customer_topup_baseline
+      - topup_total_amount
+      - topup_average_amount
+      - failed_topup_count
+      - delayed_topup_count
+      - distinct_funding_source_count
+      - customer_impact
+      - customer_impact_type
+
+  get_topups:
+    description: Individual top-up records for drill-down.
+    args: [customer_ref, window_hours, limit]
+    returns:
+      - topup_id
+      - customer_ref
+      - programme_ref
+      - timestamp
+      - amount
+      - currency
+      - funding_source_ref
+      - topup_status
+      - delay_reason
+
+  get_screening:
+    description: >
+      Screening result summary. Status only — no list data, and nothing here
+      is writable by the investigation layer.
+    args: [customer_ref]
+    returns:
+      - screening_ref
+      - customer_ref
+      - screening_type
+      - match_status
+      - match_confidence_band
+      - list_type
+      - review_required
+      - last_screened_at
+      - analyst_action
+      - previous_screening_review_count
+
+  get_kyb_history:
+    description: KYB / KYC check history and outstanding verification items.
+    args: [customer_ref]
+    returns:
+      - customer_ref
+      - kyb_check_count
+      - failed_kyb_check_count
+      - last_kyb_check_at
+      - last_kyb_failure_reason
+      - outstanding_documents
+      - beneficial_owner_verification_attempts
+      - corporate_structure_available
+
+  get_counterparty_summary:
+    description: Counterparty concentration and overlap over a window.
+    args: [customer_ref, window_hours]
+    returns:
+      - customer_ref
+      - window_hours
+      - distinct_counterparty_count
+      - top_counterparty_ref
+      - top_counterparty_share
+      - new_counterparty_count
+      - shared_counterparty_refs
+      - counterparty_jurisdictions
+
+  get_prior_alerts:
+    description: Previous alerts for the same customer within a lookback period.
+    args: [customer_ref, lookback_days]
+    returns:
+      - customer_ref
+      - lookback_days
+      - prior_alert_count
+      - prior_alert_refs
+      - prior_alert_categories
+      - last_prior_alert_at
+      - prior_outcome_summary

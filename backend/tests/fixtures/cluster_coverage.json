@@ -1,0 +1,55 @@
+{
+  "_note": "Alerts only. Cluster detection reads alert-level fields exclusively, so this dataset carries no customer, transaction or screening records at all — which is itself the demonstration that clustering does not depend on enrichment (decision 13). Each cluster type has one qualifying set and one near-miss. The near-misses deliberately fail on three different threshold dimensions: alert count, customer count and time window.",
+
+  "alerts": [
+
+    {"_case": "velocity qualifying (P001): 5 alerts / 4 customers / 20.8h span",
+     "alert_id": "V01", "rule_id": "TM-VEL-014", "customer_ref": "C003", "programme_ref": "P001", "created_at": "2026-09-21T06:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V02", "rule_id": "TM-VEL-014", "customer_ref": "C004", "programme_ref": "P001", "created_at": "2026-09-21T10:30:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V03", "rule_id": "TM-VEL-014", "customer_ref": "C005", "programme_ref": "P001", "created_at": "2026-09-21T14:05:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V04", "rule_id": "TM-VEL-014", "customer_ref": "C003", "programme_ref": "P001", "created_at": "2026-09-21T19:20:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V05", "rule_id": "TM-VEL-014", "customer_ref": "C006", "programme_ref": "P001", "created_at": "2026-09-22T02:45:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "velocity NEAR-MISS (P002): 3 alerts, below min_alerts=5",
+     "alert_id": "V90", "rule_id": "TM-VEL-014", "customer_ref": "C007", "programme_ref": "P002", "created_at": "2026-09-21T08:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V91", "rule_id": "TM-VEL-014", "customer_ref": "C008", "programme_ref": "P002", "created_at": "2026-09-21T12:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "V92", "rule_id": "TM-VEL-014", "customer_ref": "C009", "programme_ref": "P002", "created_at": "2026-09-21T16:00:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "top-up qualifying (P003): 4 alerts / 3 customers / 54h span",
+     "alert_id": "U01", "rule_id": "TM-TOP-021", "customer_ref": "C010", "programme_ref": "P003", "created_at": "2026-09-19T08:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "U02", "rule_id": "TM-TOP-021", "customer_ref": "C011", "programme_ref": "P003", "created_at": "2026-09-19T21:30:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "U03", "rule_id": "TM-TOP-021", "customer_ref": "C010", "programme_ref": "P003", "created_at": "2026-09-20T15:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "U04", "rule_id": "TM-TOP-021", "customer_ref": "C012", "programme_ref": "P003", "created_at": "2026-09-21T14:00:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "top-up NEAR-MISS (P004): 3 alerts, below min_alerts=4",
+     "alert_id": "U90", "rule_id": "TM-TOP-021", "customer_ref": "C013", "programme_ref": "P004", "created_at": "2026-09-20T09:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "U91", "rule_id": "TM-TOP-021", "customer_ref": "C014", "programme_ref": "P004", "created_at": "2026-09-20T18:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "U92", "rule_id": "TM-TOP-021", "customer_ref": "C013", "programme_ref": "P004", "created_at": "2026-09-21T11:00:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "counterparty/MCC qualifying: shared_match_key CP-7781, 4 alerts / 3 customers / across two programmes / 101h span. Mixed rule_ids on purpose.",
+     "alert_id": "K01", "rule_id": "CP-LINK-071", "customer_ref": "C020", "programme_ref": "P001", "created_at": "2026-09-17T09:00:00Z", "shared_match_key": "CP-7781", "cluster_ref": null},
+    {"alert_id": "K02", "rule_id": "MC-RISK-041", "customer_ref": "C021", "programme_ref": "P003", "created_at": "2026-09-18T14:00:00Z", "shared_match_key": "CP-7781", "cluster_ref": null},
+    {"alert_id": "K03", "rule_id": "CP-LINK-071", "customer_ref": "C022", "programme_ref": "P001", "created_at": "2026-09-20T07:30:00Z", "shared_match_key": "CP-7781", "cluster_ref": null},
+    {"alert_id": "K04", "rule_id": "CP-LINK-071", "customer_ref": "C020", "programme_ref": "P001", "created_at": "2026-09-21T14:00:00Z", "shared_match_key": "CP-7781", "cluster_ref": null},
+
+    {"_case": "counterparty/MCC NEAR-MISS: shared_match_key CP-9999, 4 alerts but only 2 customers, below min_customers=3",
+     "alert_id": "K90", "rule_id": "CP-LINK-071", "customer_ref": "C030", "programme_ref": "P002", "created_at": "2026-09-18T10:00:00Z", "shared_match_key": "CP-9999", "cluster_ref": null},
+    {"alert_id": "K91", "rule_id": "CP-LINK-071", "customer_ref": "C031", "programme_ref": "P002", "created_at": "2026-09-19T10:00:00Z", "shared_match_key": "CP-9999", "cluster_ref": null},
+    {"alert_id": "K92", "rule_id": "MC-RISK-041", "customer_ref": "C030", "programme_ref": "P002", "created_at": "2026-09-20T10:00:00Z", "shared_match_key": "CP-9999", "cluster_ref": null},
+    {"alert_id": "K93", "rule_id": "CP-LINK-071", "customer_ref": "C031", "programme_ref": "P002", "created_at": "2026-09-21T10:00:00Z", "shared_match_key": "CP-9999", "cluster_ref": null},
+
+    {"_case": "counterparty control: 2 alerts with null shared_match_key must never group",
+     "alert_id": "K80", "rule_id": "CP-LINK-071", "customer_ref": "C040", "programme_ref": "P005", "created_at": "2026-09-19T09:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "K81", "rule_id": "MC-RISK-041", "customer_ref": "C041", "programme_ref": "P005", "created_at": "2026-09-19T15:00:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "screening qualifying (P005): 3 alerts / 2 customers / 76h span",
+     "alert_id": "S01", "rule_id": "SAN-PEP-061", "customer_ref": "C050", "programme_ref": "P005", "created_at": "2026-09-18T08:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "S02", "rule_id": "SAN-PEP-061", "customer_ref": "C051", "programme_ref": "P005", "created_at": "2026-09-19T20:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "S03", "rule_id": "SAN-PEP-061", "customer_ref": "C050", "programme_ref": "P005", "created_at": "2026-09-21T12:00:00Z", "shared_match_key": null, "cluster_ref": null},
+
+    {"_case": "screening NEAR-MISS (P006): 3 alerts / 2 customers but spread over 200h, exceeding time_window_hours=168",
+     "alert_id": "S90", "rule_id": "SAN-PEP-061", "customer_ref": "C060", "programme_ref": "P006", "created_at": "2026-09-10T08:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "S91", "rule_id": "SAN-PEP-061", "customer_ref": "C061", "programme_ref": "P006", "created_at": "2026-09-14T12:00:00Z", "shared_match_key": null, "cluster_ref": null},
+    {"alert_id": "S92", "rule_id": "SAN-PEP-061", "customer_ref": "C060", "programme_ref": "P006", "created_at": "2026-09-18T16:00:00Z", "shared_match_key": null, "cluster_ref": null}
+  ]
+}

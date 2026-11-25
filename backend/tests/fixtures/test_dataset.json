@@ -1,0 +1,602 @@
+{
+  "_note": "Minimal dataset for end-to-end validation only. Two unclustered alerts exercise the velocity and screening paths; five clustered velocity alerts exercise cluster formation. A001 deliberately has source_of_funds absent so the MISSING path is tested. Cluster members are fully evidenced, per the dataset rule that gaps live among unclustered alerts.",
+  "alerts": [
+    {
+      "alert_id": "A001",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C001",
+      "programme_ref": "P002",
+      "created_at": "2026-09-20T08:15:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A002",
+      "rule_id": "SAN-PEP-061",
+      "customer_ref": "C002",
+      "programme_ref": "P002",
+      "created_at": "2026-09-20T09:40:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A003",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C003",
+      "programme_ref": "P001",
+      "created_at": "2026-09-21T06:00:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A004",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C004",
+      "programme_ref": "P001",
+      "created_at": "2026-09-21T10:30:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A005",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C005",
+      "programme_ref": "P001",
+      "created_at": "2026-09-21T14:05:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A006",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C003",
+      "programme_ref": "P001",
+      "created_at": "2026-09-21T19:20:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    },
+    {
+      "alert_id": "A007",
+      "rule_id": "TM-VEL-014",
+      "customer_ref": "C006",
+      "programme_ref": "P001",
+      "created_at": "2026-09-22T02:45:00Z",
+      "shared_match_key": null,
+      "cluster_ref": null
+    }
+  ],
+  "customers": {
+    "C001": {
+      "customer_ref": "C001",
+      "business_name_placeholder": "Synthetic Business 001 OU",
+      "entity_type": "private_limited_company",
+      "onboarding_date": "2026-09-18",
+      "country": "EE",
+      "industry_segment": "media_buying",
+      "programme_ref": "P002",
+      "kyb_status": "pending_beneficial_owner_verification",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "pending",
+      "source_of_funds": null,
+      "risk_rating": "medium",
+      "previous_alert_count": 1,
+      "open_case_count": 0,
+      "last_review_date": "2026-09-18"
+    },
+    "C002": {
+      "customer_ref": "C002",
+      "business_name_placeholder": "Synthetic Business 002 OU",
+      "entity_type": "private_limited_company",
+      "onboarding_date": "2025-11-02",
+      "country": "LV",
+      "industry_segment": "logistics",
+      "programme_ref": "P002",
+      "kyb_status": "complete",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "verified",
+      "source_of_funds": "trading_income_declared",
+      "risk_rating": "high",
+      "previous_alert_count": 3,
+      "open_case_count": 1,
+      "last_review_date": "2026-06-14"
+    },
+    "C003": {
+      "customer_ref": "C003",
+      "business_name_placeholder": "Synthetic Business 003 OU",
+      "entity_type": "private_limited_company",
+      "onboarding_date": "2026-09-19",
+      "country": "EE",
+      "industry_segment": "influencer_marketing",
+      "programme_ref": "P001",
+      "kyb_status": "complete",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "verified",
+      "source_of_funds": "investor_funding_declared",
+      "risk_rating": "medium",
+      "previous_alert_count": 0,
+      "open_case_count": 0,
+      "last_review_date": "2026-09-19"
+    },
+    "C004": {
+      "customer_ref": "C004",
+      "business_name_placeholder": "Synthetic Business 004 OU",
+      "entity_type": "private_limited_company",
+      "onboarding_date": "2026-09-19",
+      "country": "EE",
+      "industry_segment": "media_buying",
+      "programme_ref": "P001",
+      "kyb_status": "complete",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "verified",
+      "source_of_funds": "trading_income_declared",
+      "risk_rating": "medium",
+      "previous_alert_count": 0,
+      "open_case_count": 0,
+      "last_review_date": "2026-09-19"
+    },
+    "C005": {
+      "customer_ref": "C005",
+      "business_name_placeholder": "Synthetic Business 005 OU",
+      "entity_type": "sole_trader",
+      "onboarding_date": "2026-09-18",
+      "country": "EE",
+      "industry_segment": "media_buying",
+      "programme_ref": "P001",
+      "kyb_status": "complete",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "verified",
+      "source_of_funds": "trading_income_declared",
+      "risk_rating": "low",
+      "previous_alert_count": 0,
+      "open_case_count": 0,
+      "last_review_date": "2026-09-18"
+    },
+    "C006": {
+      "customer_ref": "C006",
+      "business_name_placeholder": "Synthetic Business 006 OU",
+      "entity_type": "private_limited_company",
+      "onboarding_date": "2026-09-20",
+      "country": "EE",
+      "industry_segment": "ecommerce_marketplace",
+      "programme_ref": "P001",
+      "kyb_status": "complete",
+      "kyc_status": "complete",
+      "beneficial_owner_status": "verified",
+      "source_of_funds": "trading_income_declared",
+      "risk_rating": "medium",
+      "previous_alert_count": 0,
+      "open_case_count": 0,
+      "last_review_date": "2026-09-20"
+    }
+  },
+  "programmes": {
+    "P001": {
+      "programme_ref": "P001",
+      "programme_name_placeholder": "Programme Alpha (media buying)",
+      "partner_type": "white_label",
+      "primary_jurisdiction": "EE",
+      "active_customer_count": 1840,
+      "programme_transaction_baseline": 140,
+      "programme_topup_baseline": 12,
+      "monitored_merchant_categories": [
+        "money_transfer",
+        "precious_metals",
+        "advertising_services"
+      ],
+      "high_risk_jurisdictions": [
+        "AE",
+        "CY"
+      ]
+    },
+    "P002": {
+      "programme_ref": "P002",
+      "programme_name_placeholder": "Programme Beta (logistics)",
+      "partner_type": "direct_business",
+      "primary_jurisdiction": "LV",
+      "active_customer_count": 620,
+      "programme_transaction_baseline": 95,
+      "programme_topup_baseline": 8,
+      "monitored_merchant_categories": [
+        "money_transfer",
+        "fuel"
+      ],
+      "high_risk_jurisdictions": [
+        "AE"
+      ]
+    }
+  },
+  "transaction_summaries": {
+    "C001": {
+      "customer_ref": "C001",
+      "transaction_count": 1250,
+      "customer_transaction_baseline": 120,
+      "total_amount": 412900,
+      "average_amount": 330,
+      "declined_transaction_count": 4,
+      "failed_transaction_count": 2,
+      "distinct_merchant_category_count": 3,
+      "top_merchant_category": "advertising_services",
+      "monitored_mcc_transaction_count": 840,
+      "distinct_country_count": 2,
+      "top_country_exposure": "EE",
+      "high_risk_country_transaction_count": 0,
+      "card_present_count": 12,
+      "card_not_present_count": 1238,
+      "unusual_velocity_flag": true
+    },
+    "C002": {
+      "customer_ref": "C002",
+      "transaction_count": 210,
+      "customer_transaction_baseline": 190,
+      "total_amount": 88400,
+      "average_amount": 421,
+      "declined_transaction_count": 1,
+      "failed_transaction_count": 0,
+      "distinct_merchant_category_count": 5,
+      "top_merchant_category": "fuel",
+      "monitored_mcc_transaction_count": 30,
+      "distinct_country_count": 4,
+      "top_country_exposure": "LV",
+      "high_risk_country_transaction_count": 2,
+      "card_present_count": 160,
+      "card_not_present_count": 50,
+      "unusual_velocity_flag": false
+    },
+    "C003": {
+      "customer_ref": "C003",
+      "transaction_count": 980,
+      "customer_transaction_baseline": 110,
+      "total_amount": 301200,
+      "average_amount": 307,
+      "declined_transaction_count": 3,
+      "failed_transaction_count": 1,
+      "distinct_merchant_category_count": 2,
+      "top_merchant_category": "advertising_services",
+      "monitored_mcc_transaction_count": 720,
+      "distinct_country_count": 1,
+      "top_country_exposure": "EE",
+      "high_risk_country_transaction_count": 0,
+      "card_present_count": 5,
+      "card_not_present_count": 975,
+      "unusual_velocity_flag": true
+    },
+    "C004": {
+      "customer_ref": "C004",
+      "transaction_count": 1120,
+      "customer_transaction_baseline": 130,
+      "total_amount": 356700,
+      "average_amount": 318,
+      "declined_transaction_count": 2,
+      "failed_transaction_count": 0,
+      "distinct_merchant_category_count": 2,
+      "top_merchant_category": "advertising_services",
+      "monitored_mcc_transaction_count": 810,
+      "distinct_country_count": 1,
+      "top_country_exposure": "EE",
+      "high_risk_country_transaction_count": 0,
+      "card_present_count": 8,
+      "card_not_present_count": 1112,
+      "unusual_velocity_flag": true
+    },
+    "C005": {
+      "customer_ref": "C005",
+      "transaction_count": 860,
+      "customer_transaction_baseline": 100,
+      "total_amount": 254000,
+      "average_amount": 295,
+      "declined_transaction_count": 1,
+      "failed_transaction_count": 1,
+      "distinct_merchant_category_count": 3,
+      "top_merchant_category": "advertising_services",
+      "monitored_mcc_transaction_count": 640,
+      "distinct_country_count": 1,
+      "top_country_exposure": "EE",
+      "high_risk_country_transaction_count": 0,
+      "card_present_count": 3,
+      "card_not_present_count": 857,
+      "unusual_velocity_flag": true
+    },
+    "C006": {
+      "customer_ref": "C006",
+      "transaction_count": 1340,
+      "customer_transaction_baseline": 150,
+      "total_amount": 448800,
+      "average_amount": 335,
+      "declined_transaction_count": 5,
+      "failed_transaction_count": 2,
+      "distinct_merchant_category_count": 4,
+      "top_merchant_category": "digital_goods",
+      "monitored_mcc_transaction_count": 390,
+      "distinct_country_count": 2,
+      "top_country_exposure": "EE",
+      "high_risk_country_transaction_count": 0,
+      "card_present_count": 14,
+      "card_not_present_count": 1326,
+      "unusual_velocity_flag": true
+    }
+  },
+  "transactions": {
+    "C001": [
+      {
+        "transaction_id": "T0001",
+        "customer_ref": "C001",
+        "programme_ref": "P002",
+        "timestamp": "2026-09-20T07:02:00Z",
+        "transaction_type": "purchase",
+        "amount": 420,
+        "currency": "EUR",
+        "merchant_category": "advertising_services",
+        "counterparty_ref": "CP-7781",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      },
+      {
+        "transaction_id": "T0002",
+        "customer_ref": "C001",
+        "programme_ref": "P002",
+        "timestamp": "2026-09-20T07:11:00Z",
+        "transaction_type": "purchase",
+        "amount": 380,
+        "currency": "EUR",
+        "merchant_category": "advertising_services",
+        "counterparty_ref": "CP-7781",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      },
+      {
+        "transaction_id": "T0003",
+        "customer_ref": "C001",
+        "programme_ref": "P002",
+        "timestamp": "2026-09-20T07:48:00Z",
+        "transaction_type": "purchase",
+        "amount": 295,
+        "currency": "EUR",
+        "merchant_category": "digital_goods",
+        "counterparty_ref": "CP-9120",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "declined"
+      }
+    ],
+    "C002": [
+      {
+        "transaction_id": "T0101",
+        "customer_ref": "C002",
+        "programme_ref": "P002",
+        "timestamp": "2026-09-19T12:00:00Z",
+        "transaction_type": "purchase",
+        "amount": 510,
+        "currency": "EUR",
+        "merchant_category": "fuel",
+        "counterparty_ref": "CP-3301",
+        "country": "LV",
+        "channel": "card_present",
+        "transaction_status": "settled"
+      }
+    ],
+    "C003": [
+      {
+        "transaction_id": "T0201",
+        "customer_ref": "C003",
+        "programme_ref": "P001",
+        "timestamp": "2026-09-21T05:40:00Z",
+        "transaction_type": "purchase",
+        "amount": 310,
+        "currency": "EUR",
+        "merchant_category": "advertising_services",
+        "counterparty_ref": "CP-7781",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      }
+    ],
+    "C004": [
+      {
+        "transaction_id": "T0301",
+        "customer_ref": "C004",
+        "programme_ref": "P001",
+        "timestamp": "2026-09-21T10:10:00Z",
+        "transaction_type": "purchase",
+        "amount": 288,
+        "currency": "EUR",
+        "merchant_category": "advertising_services",
+        "counterparty_ref": "CP-7781",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      }
+    ],
+    "C005": [
+      {
+        "transaction_id": "T0401",
+        "customer_ref": "C005",
+        "programme_ref": "P001",
+        "timestamp": "2026-09-21T13:55:00Z",
+        "transaction_type": "purchase",
+        "amount": 265,
+        "currency": "EUR",
+        "merchant_category": "advertising_services",
+        "counterparty_ref": "CP-4412",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      }
+    ],
+    "C006": [
+      {
+        "transaction_id": "T0501",
+        "customer_ref": "C006",
+        "programme_ref": "P001",
+        "timestamp": "2026-09-22T02:20:00Z",
+        "transaction_type": "purchase",
+        "amount": 340,
+        "currency": "EUR",
+        "merchant_category": "digital_goods",
+        "counterparty_ref": "CP-9120",
+        "country": "EE",
+        "channel": "card_not_present",
+        "transaction_status": "settled"
+      }
+    ]
+  },
+  "topup_summaries": {
+    "C001": {
+      "customer_ref": "C001",
+      "topup_count": 14,
+      "customer_topup_baseline": 6,
+      "topup_total_amount": 180000,
+      "topup_average_amount": 12857,
+      "failed_topup_count": 1,
+      "delayed_topup_count": 0,
+      "distinct_funding_source_count": 2,
+      "customer_impact": false,
+      "customer_impact_type": null
+    },
+    "C002": {
+      "customer_ref": "C002",
+      "topup_count": 5,
+      "customer_topup_baseline": 6,
+      "topup_total_amount": 42000,
+      "topup_average_amount": 8400,
+      "failed_topup_count": 0,
+      "delayed_topup_count": 0,
+      "distinct_funding_source_count": 1,
+      "customer_impact": false,
+      "customer_impact_type": null
+    }
+  },
+  "topups": {
+    "C001": [
+      {
+        "topup_id": "U0001",
+        "customer_ref": "C001",
+        "programme_ref": "P002",
+        "timestamp": "2026-09-19T16:00:00Z",
+        "amount": 25000,
+        "currency": "EUR",
+        "funding_source_ref": "FS-221",
+        "topup_status": "accepted",
+        "delay_reason": null
+      }
+    ]
+  },
+  "screenings": {
+    "C002": {
+      "screening_ref": "SCR-0001",
+      "customer_ref": "C002",
+      "screening_type": "pep",
+      "match_status": "possible_match",
+      "match_confidence_band": "medium",
+      "list_type": "pep_domestic",
+      "review_required": true,
+      "last_screened_at": "2026-09-20T09:30:00Z",
+      "analyst_action": null,
+      "previous_screening_review_count": 1
+    }
+  },
+  "kyb_history": {
+    "C001": {
+      "customer_ref": "C001",
+      "kyb_check_count": 2,
+      "failed_kyb_check_count": 1,
+      "last_kyb_check_at": "2026-09-19T11:00:00Z",
+      "last_kyb_failure_reason": "beneficial_owner_document_not_supplied",
+      "outstanding_documents": [
+        "ubo_declaration"
+      ],
+      "beneficial_owner_verification_attempts": 2,
+      "corporate_structure_available": false
+    }
+  },
+  "counterparty_summaries": {
+    "C001": {
+      "customer_ref": "C001",
+      "distinct_counterparty_count": 6,
+      "top_counterparty_ref": "CP-7781",
+      "top_counterparty_share": 0.62,
+      "new_counterparty_count": 3,
+      "shared_counterparty_refs": [
+        "CP-7781"
+      ],
+      "counterparty_jurisdictions": [
+        "EE",
+        "CY"
+      ]
+    },
+    "C002": {
+      "customer_ref": "C002",
+      "distinct_counterparty_count": 11,
+      "top_counterparty_ref": "CP-3301",
+      "top_counterparty_share": 0.21,
+      "new_counterparty_count": 1,
+      "shared_counterparty_refs": [],
+      "counterparty_jurisdictions": [
+        "LV",
+        "LT"
+      ]
+    }
+  },
+  "prior_alerts": {
+    "C001": {
+      "customer_ref": "C001",
+      "prior_alert_count": 1,
+      "prior_alert_refs": [
+        "A000"
+      ],
+      "prior_alert_categories": [
+        "unusual_transaction_velocity"
+      ],
+      "last_prior_alert_at": "2026-09-19T10:00:00Z",
+      "prior_outcome_summary": "no_action_required"
+    },
+    "C002": {
+      "customer_ref": "C002",
+      "prior_alert_count": 3,
+      "prior_alert_refs": [
+        "A-91",
+        "A-77",
+        "A-54"
+      ],
+      "prior_alert_categories": [
+        "sanctions_pep_screening_review_required",
+        "high_risk_geography_exposure"
+      ],
+      "last_prior_alert_at": "2026-08-30T14:00:00Z",
+      "prior_outcome_summary": "escalated_to_sanctions_analyst"
+    },
+    "C003": {
+      "customer_ref": "C003",
+      "prior_alert_count": 0,
+      "prior_alert_refs": [],
+      "prior_alert_categories": [],
+      "last_prior_alert_at": null,
+      "prior_outcome_summary": "none"
+    },
+    "C004": {
+      "customer_ref": "C004",
+      "prior_alert_count": 0,
+      "prior_alert_refs": [],
+      "prior_alert_categories": [],
+      "last_prior_alert_at": null,
+      "prior_outcome_summary": "none"
+    },
+    "C005": {
+      "customer_ref": "C005",
+      "prior_alert_count": 0,
+      "prior_alert_refs": [],
+      "prior_alert_categories": [],
+      "last_prior_alert_at": null,
+      "prior_outcome_summary": "none"
+    },
+    "C006": {
+      "customer_ref": "C006",
+      "prior_alert_count": 0,
+      "prior_alert_refs": [],
+      "prior_alert_categories": [],
+      "last_prior_alert_at": null,
+      "prior_outcome_summary": "none"
+    }
+  }
+}

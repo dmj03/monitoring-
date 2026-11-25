@@ -1,0 +1,52 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Secrets / environment ----
+# Real keys live in .env (OPENAI_API_KEY). Templates are kept.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
+# ---- Frontend ----
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.vite/
+npm-debug.log*
+# Standalone design-review build (node design-review/build-standalone.mjs)
+frontend/design-review/UC3_Design_Review.html
+
+# ---- Application runtime output ----
+# Accepted AI summaries (runtime cache, not source data)
+data/ai_cache.json
+# Debug dump of the last OpenAI request payload
+last_request.json
+*.log
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*~
+*.tmp
+*.bak

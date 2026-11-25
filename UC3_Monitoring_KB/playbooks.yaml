@@ -1,0 +1,1127 @@
+# UC3 investigation playbooks — one per individual alert category.
+#
+# A playbook is the procedure layer. It says what to check and where to get it.
+# It never contains customer facts.
+#
+# required_evidence is an ordered list. Each entry names:
+#   key               - the evidence item as it appears in the evidence pack
+#   tool              - which registered tool supplies it
+#   field             - which field of that tool's return carries it
+#   args              - how the tool's arguments resolve (alert.<field>, or a literal)
+#   required          - true for investigation evidence, false for drill-down payload
+#   missing_behaviour - what an absent value means for this item
+#
+# Entries resolving to the same (tool, args) are deduplicated by the executor
+# into a single call.
+#
+# On missing_behaviour: the engine records every absent value identically, as
+# MISSING with no value attached, and an absent value never fails or halts an
+# investigation. The distinction below is interpretive — it tells the analyst and
+# the model whether the gap bears on the outcome. It does not change execution.
+#
+#   record_missing_may_support_insufficient_evidence
+#       required investigation evidence; its absence is a finding and may
+#       support an insufficient-evidence recommendation
+#   record_missing_no_outcome_impact
+#       drill-down payload; its absence limits the UI view only
+#
+# Nothing here marks evidence as blocking. Insufficient evidence is a
+# recommended outcome the analyst confirms, not an automatic gate.
+#
+# allowed_outcomes is a subset of investigation_outcomes in config.yaml. The
+# model may recommend only from its playbook's subset.
+#
+# investigation_checklist IS the investigation guidance for a playbook. There is
+# deliberately no second field restating it.
+
+version: kb-playbooks-1.0.1-phase1
+global_ai_boundaries:
+  applies_to: every playbook in this KB
+  note: These boundaries are global. Each playbook's own ai_boundaries field adds domain-specific restrictions
+    on top of them and never relaxes them.
+  model_may:
+  - interpret evidence that was actually fetched
+  - summarise the evidence pack
+  - explain the pattern the evidence shows
+  - produce an internal analyst rationale
+  - recommend one outcome from the playbook's allowed_outcomes
+  - recommend insufficient evidence where required evidence is MISSING
+  model_must_not:
+  - invent evidence
+  - fabricate values
+  - fill a MISSING field with an assumption
+  - state or imply that evidence exists when it is MISSING
+  - select the playbook
+  - select tools
+  - decide which evidence to retrieve
+  - change the alert category
+  - create a cluster
+  - decide or modify cluster membership
+  - invent customer, programme, transaction or screening information
+  - override a deterministic tool result
+  - bypass required evidence
+  - make the final human decision
+  - recommend an outcome outside the playbook's allowed_outcomes
+  - change detection or clustering thresholds
+  - change, override or modify approved policy or configuration
+  - take prohibited external actions or act outside the approved workflow
+  screening_specific:
+  - must not confirm a possible match as a confirmed match
+  - must not dismiss a possible match as cleared
+  - must not make a final sanctions or PEP decision
+  - must not infer anything from the confidence band beyond reporting its value
+  outcome_contract: The model recommends. The analyst confirms. A recommended outcome is never a decision
+    and is never final.
+playbooks:
+  unusual_transaction_velocity:
+    playbook_id: unusual_transaction_velocity
+    version: 1.0.0
+    category: unusual_transaction_velocity
+    rule_ids:
+    - TM-VEL-014
+    description: Transaction activity has risen sharply against the customer's own recent norm.
+    purpose: Give the analyst both baselines, the verification position and prior alert history, so the
+      rise can be judged as explained or unexplained. The playbook does not assess whether the upstream
+      rule should have fired.
+    investigation_focus: 'Establish whether the observed activity is explainable against the customer''s
+      own baseline and the programme baseline, and whether verification evidence supports activity at
+      this level.
+
+      '
+    required_evidence:
+    - key: transaction_activity
+      tool: get_transaction_summary
+      field: transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 48
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_transaction_baseline
+      tool: get_transaction_summary
+      field: customer_transaction_baseline
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 48
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: programme_transaction_baseline
+      tool: get_programme
+      field: programme_transaction_baseline
+      args:
+        programme_ref: alert.programme_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: onboarding_date
+      tool: get_customer
+      field: onboarding_date
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: beneficial_owner_status
+      tool: get_customer
+      field: beneficial_owner_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: source_of_funds
+      tool: get_customer
+      field: source_of_funds
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 48
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Compare observed activity against the customer baseline and the programme baseline separately.
+    - Confirm whether KYB and beneficial-owner verification are complete.
+    - Review source-of-funds evidence for activity at this level.
+    - Check whether prior alerts show a developing pattern.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation for analyst decision where verification evidence is incomplete
+      or the activity is unexplained against both baselines.
+
+      '
+    ai_boundaries: 'Do not state that the activity is suspicious or that the rule fired correctly. Recommend
+      investigation focus only.
+
+      '
+  unusual_topup_pattern:
+    playbook_id: unusual_topup_pattern
+    version: 1.0.0
+    category: unusual_topup_pattern
+    rule_ids:
+    - TM-TOP-021
+    description: Inbound top-up volume, frequency or funding spread has changed materially.
+    purpose: Assemble top-up behaviour, funding spread and any current customer impact so the analyst
+      can see at once whether funds are held and what evidence is outstanding.
+    investigation_focus: 'Establish whether the top-up pattern is explainable, what funding sources are
+      involved, and whether the customer is currently impacted.
+
+      '
+    required_evidence:
+    - key: topup_activity
+      tool: get_topup_summary
+      field: topup_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_topup_baseline
+      tool: get_topup_summary
+      field: customer_topup_baseline
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: programme_topup_baseline
+      tool: get_programme
+      field: programme_topup_baseline
+      args:
+        programme_ref: alert.programme_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: funding_source_spread
+      tool: get_topup_summary
+      field: distinct_funding_source_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: delayed_topup_count
+      tool: get_topup_summary
+      field: delayed_topup_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_impact
+      tool: get_topup_summary
+      field: customer_impact
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_impact_type
+      tool: get_topup_summary
+      field: customer_impact_type
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: source_of_funds
+      tool: get_customer
+      field: source_of_funds
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: topup_records
+      tool: get_topups
+      field: topup_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Compare top-up volume and frequency against the customer and programme baselines.
+    - Review the spread of funding sources.
+    - Confirm whether funds are currently delayed or held and record the impacted process.
+    - Review source-of-funds evidence.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Where funds are impacted, flag for human review promptly. Any customer contact
+      is handled outside this layer.
+
+      '
+    ai_boundaries: 'Do not draft customer-facing wording, suspicion reasoning, or any explanation intended
+      to be sent to the customer.
+
+      '
+  high_risk_geography_exposure:
+    playbook_id: high_risk_geography_exposure
+    version: 1.0.0
+    category: high_risk_geography_exposure
+    rule_ids:
+    - RG-GEO-031
+    description: Activity touches jurisdictions the programme treats as elevated risk.
+    purpose: Show which jurisdictions carry the exposure and whether that fits the customer's stated business,
+      using the programme's own elevated-risk list rather than any external classification.
+    investigation_focus: 'Establish which jurisdictions the activity touches, whether that exposure is
+      consistent with the customer''s stated business, and whether the programme treats those jurisdictions
+      as elevated risk.
+
+      '
+    required_evidence:
+    - key: country_exposure
+      tool: get_transaction_summary
+      field: top_country_exposure
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: high_risk_country_volume
+      tool: get_transaction_summary
+      field: high_risk_country_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: country_spread
+      tool: get_transaction_summary
+      field: distinct_country_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: programme_high_risk_list
+      tool: get_programme
+      field: high_risk_jurisdictions
+      args:
+        programme_ref: alert.programme_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_country
+      tool: get_customer
+      field: country
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: industry_segment
+      tool: get_customer
+      field: industry_segment
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Identify which jurisdictions account for the exposure.
+    - Compare exposure against the programme's elevated-risk jurisdiction list.
+    - Assess whether the exposure fits the customer's stated industry and country.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation where exposure to listed jurisdictions is material and unexplained
+      by the customer''s stated business.
+
+      '
+    ai_boundaries: 'Do not characterise a jurisdiction as sanctioned or draw sanctions conclusions. Jurisdiction
+      risk here is the programme''s own classification.
+
+      '
+  high_risk_merchant_category:
+    playbook_id: high_risk_merchant_category
+    version: 1.0.0
+    category: high_risk_merchant_category
+    rule_ids:
+    - MC-RISK-041
+    description: Spend is concentrated in merchant categories the programme monitors.
+    purpose: Identify which monitored categories drive the alert and whether the pattern is consistent
+      with the customer's stated industry.
+    investigation_focus: 'Establish which monitored merchant categories the activity falls into and whether
+      that is consistent with the customer''s stated business.
+
+      '
+    required_evidence:
+    - key: top_merchant_category
+      tool: get_transaction_summary
+      field: top_merchant_category
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: monitored_mcc_volume
+      tool: get_transaction_summary
+      field: monitored_mcc_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: merchant_category_spread
+      tool: get_transaction_summary
+      field: distinct_merchant_category_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: programme_monitored_mccs
+      tool: get_programme
+      field: monitored_merchant_categories
+      args:
+        programme_ref: alert.programme_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: industry_segment
+      tool: get_customer
+      field: industry_segment
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: entity_type
+      tool: get_customer
+      field: entity_type
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Identify the monitored categories driving the alert.
+    - Compare against the customer's stated industry segment.
+    - Check whether the pattern also appears across the programme.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation where monitored-category activity is material and inconsistent
+      with the stated business.
+
+      '
+    ai_boundaries: 'Do not conclude that the merchant category indicates wrongdoing.
+
+      '
+  repeated_failed_kyb_kyc_checks:
+    playbook_id: repeated_failed_kyb_kyc_checks
+    version: 1.0.0
+    category: repeated_failed_kyb_kyc_checks
+    rule_ids:
+    - KYB-FAIL-051
+    description: Verification checks have failed or remain outstanding for this customer.
+    purpose: Set out what verification was attempted, what failed and what is outstanding, so the analyst
+      can decide what to request rather than re-deriving the file history.
+    investigation_focus: 'Establish what verification has been attempted, what remains outstanding, and
+      what is needed to complete the file.
+
+      '
+    required_evidence:
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyc_status
+      tool: get_customer
+      field: kyc_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: beneficial_owner_status
+      tool: get_customer
+      field: beneficial_owner_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: failed_check_count
+      tool: get_kyb_history
+      field: failed_kyb_check_count
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: last_failure_reason
+      tool: get_kyb_history
+      field: last_kyb_failure_reason
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: outstanding_documents
+      tool: get_kyb_history
+      field: outstanding_documents
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: bo_verification_attempts
+      tool: get_kyb_history
+      field: beneficial_owner_verification_attempts
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: corporate_structure
+      tool: get_kyb_history
+      field: corporate_structure_available
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: onboarding_date
+      tool: get_customer
+      field: onboarding_date
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 180
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    investigation_checklist:
+    - List what verification has been attempted and what failed.
+    - Identify outstanding documents and the beneficial-owner position.
+    - Determine what is required to complete the file.
+    allowed_outcomes:
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Where verification cannot be completed from available evidence, recommend insufficient
+      evidence for analyst confirmation.
+
+      '
+    ai_boundaries: 'Do not approve, reject or re-rate the customer. Do not decide offboarding.
+
+      '
+  sanctions_pep_screening_review_required:
+    playbook_id: sanctions_pep_screening_review_required
+    version: 1.0.0
+    category: sanctions_pep_screening_review_required
+    rule_ids:
+    - SAN-PEP-061
+    description: Upstream screening produced a possible match requiring manual analyst review.
+    purpose: Present the screening context verbatim and assemble identifying detail for the sanctions
+      analyst. The match itself is never assessed here.
+    investigation_focus: 'Present the screening context accurately for a sanctions analyst and assemble
+      the identifying context they will need. The match itself is not assessed here.
+
+      '
+    required_evidence:
+    - key: screening_status
+      tool: get_screening
+      field: match_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: match_confidence_band
+      tool: get_screening
+      field: match_confidence_band
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: screening_type
+      tool: get_screening
+      field: screening_type
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: list_type
+      tool: get_screening
+      field: list_type
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: last_screened_at
+      tool: get_screening
+      field: last_screened_at
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: review_required
+      tool: get_screening
+      field: review_required
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: previous_screening_reviews
+      tool: get_screening
+      field: previous_screening_review_count
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_country
+      tool: get_customer
+      field: country
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: entity_type
+      tool: get_customer
+      field: entity_type
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: beneficial_owner_status
+      tool: get_customer
+      field: beneficial_owner_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 180
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    investigation_checklist:
+    - Record the screening status, type, list type and confidence band exactly as returned.
+    - Assemble identifying context available for analyst comparison.
+    - Note whether this customer has been through screening review before.
+    - Route to the sanctions analyst under the approved escalation process.
+    allowed_outcomes:
+    - escalate_to_sanctions_analyst
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Always route to a sanctions analyst. This category does not have a no-escalation
+      path.
+
+      '
+    ai_boundaries: 'Do not confirm the match. Do not dismiss the match. Do not call it a false positive,
+      a likely name collision, or low concern. Do not infer anything from the confidence band beyond reporting
+      its value. Screening fields are reported verbatim.
+
+      '
+  linked_party_or_counterparty_review:
+    playbook_id: linked_party_or_counterparty_review
+    version: 1.0.0
+    category: linked_party_or_counterparty_review
+    rule_ids:
+    - CP-LINK-071
+    description: Counterparty activity is concentrated, newly seen, or shared across customers.
+    purpose: Quantify counterparty concentration and overlap so the analyst can distinguish an ordinary
+      common supplier from a linked-party concern.
+    investigation_focus: 'Establish the counterparty concentration, whether counterparties are newly seen,
+      and whether the commercial relationship is explainable.
+
+      '
+    required_evidence:
+    - key: counterparty_spread
+      tool: get_counterparty_summary
+      field: distinct_counterparty_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: top_counterparty
+      tool: get_counterparty_summary
+      field: top_counterparty_ref
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: top_counterparty_share
+      tool: get_counterparty_summary
+      field: top_counterparty_share
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: new_counterparty_count
+      tool: get_counterparty_summary
+      field: new_counterparty_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: shared_counterparties
+      tool: get_counterparty_summary
+      field: shared_counterparty_refs
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: counterparty_jurisdictions
+      tool: get_counterparty_summary
+      field: counterparty_jurisdictions
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: industry_segment
+      tool: get_customer
+      field: industry_segment
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Identify the concentrated counterparty and its share of activity.
+    - Establish whether counterparties are newly seen for this customer.
+    - Check whether the same counterparty appears for other customers.
+    - Assess whether the commercial rationale is explainable.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation where concentration is high and the relationship is unexplained,
+      or where the counterparty is shared across customers.
+
+      '
+    ai_boundaries: 'Do not assert that parties are connected for illicit purposes. Shared counterparties
+      may be ordinary common suppliers.
+
+      '
+  possible_account_misuse:
+    playbook_id: possible_account_misuse
+    version: 1.0.0
+    category: possible_account_misuse
+    rule_ids:
+    - AC-MISUSE-081
+    description: Account usage diverges from the expected profile for this customer and programme.
+    purpose: Compare usage against the customer's own baseline and stated business, and surface third-party-use
+      indicators such as counterparty spread and failure rate.
+    investigation_focus: 'Establish whether account usage is consistent with the expected profile for
+      this customer and programme.
+
+      '
+    required_evidence:
+    - key: transaction_activity
+      tool: get_transaction_summary
+      field: transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_transaction_baseline
+      tool: get_transaction_summary
+      field: customer_transaction_baseline
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: failed_transaction_count
+      tool: get_transaction_summary
+      field: failed_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: counterparty_spread
+      tool: get_counterparty_summary
+      field: distinct_counterparty_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: onboarding_date
+      tool: get_customer
+      field: onboarding_date
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: industry_segment
+      tool: get_customer
+      field: industry_segment
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: open_cases
+      tool: get_customer
+      field: open_case_count
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 168
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Compare usage against the customer's own baseline and stated business.
+    - Review counterparty spread and failure rate for signs of third-party use.
+    - Check open cases and prior alerts for a developing pattern.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - escalate_to_mlro
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation where usage is materially inconsistent with the expected
+      profile.
+
+      '
+    ai_boundaries: 'Do not conclude that the account is being misused or by whom.
+
+      '
+  possible_card_misuse:
+    playbook_id: possible_card_misuse
+    version: 1.0.0
+    category: possible_card_misuse
+    rule_ids:
+    - CARD-MISUSE-091
+    description: Decline and channel patterns are inconsistent with ordinary card usage.
+    purpose: Characterise the decline and channel pattern from transaction-shape evidence alone, since
+      no card identifier is available to this POC.
+    investigation_focus: 'Establish the decline and channel pattern behind the alert. Card identity is
+      out of scope: the investigation works from transaction-level indicators only.
+
+      '
+    required_evidence:
+    - key: declined_transaction_count
+      tool: get_transaction_summary
+      field: declined_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_activity
+      tool: get_transaction_summary
+      field: transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: customer_transaction_baseline
+      tool: get_transaction_summary
+      field: customer_transaction_baseline
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: card_present_volume
+      tool: get_transaction_summary
+      field: card_present_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: card_not_present_volume
+      tool: get_transaction_summary
+      field: card_not_present_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: merchant_category_spread
+      tool: get_transaction_summary
+      field: distinct_merchant_category_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: country_spread
+      tool: get_transaction_summary
+      field: distinct_country_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 30
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 24
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Review the decline pattern against normal activity for this customer.
+    - Compare card-present and card-not-present volumes.
+    - Check whether declines cluster in time, category or geography.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation where the decline pattern is concentrated and unexplained
+      by ordinary retry behaviour.
+
+      '
+    ai_boundaries: 'Do not conclude fraud. Do not recommend restricting or blocking a card. No card identifiers
+      are available to this investigation.
+
+      '
+  repeated_failed_transaction_or_topup_pattern:
+    playbook_id: repeated_failed_transaction_or_topup_pattern
+    version: 1.0.0
+    category: repeated_failed_transaction_or_topup_pattern
+    rule_ids:
+    - TXN-FAIL-101
+    description: Repeated transaction or top-up failures have occurred within a short window.
+    purpose: Separate transaction failures from top-up failures and surface whether an ordinary operational
+      cause explains the pattern.
+    investigation_focus: 'Establish whether repeated failures have an ordinary operational explanation
+      or indicate a pattern requiring review.
+
+      '
+    required_evidence:
+    - key: failed_transaction_count
+      tool: get_transaction_summary
+      field: failed_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: declined_transaction_count
+      tool: get_transaction_summary
+      field: declined_transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_activity
+      tool: get_transaction_summary
+      field: transaction_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: failed_topup_count
+      tool: get_topup_summary
+      field: failed_topup_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: topup_activity
+      tool: get_topup_summary
+      field: topup_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: funding_source_spread
+      tool: get_topup_summary
+      field: distinct_funding_source_count
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: kyb_status
+      tool: get_customer
+      field: kyb_status
+      args:
+        customer_ref: alert.customer_ref
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: prior_alerts
+      tool: get_prior_alerts
+      field: prior_alert_count
+      args:
+        customer_ref: alert.customer_ref
+        lookback_days: 90
+      required: true
+      missing_behaviour: record_missing_may_support_insufficient_evidence
+    - key: transaction_records
+      tool: get_transactions
+      field: transaction_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    - key: topup_records
+      tool: get_topups
+      field: topup_id
+      args:
+        customer_ref: alert.customer_ref
+        window_hours: 72
+        limit: 25
+      required: false
+      missing_behaviour: record_missing_no_outcome_impact
+    investigation_checklist:
+    - Separate transaction failures from top-up failures.
+    - Check whether failures concentrate on one funding source or counterparty.
+    - Consider ordinary operational causes such as expired instruments or retries.
+    allowed_outcomes:
+    - no_action_required
+    - information_requested
+    - insufficient_evidence_manual_investigation_required
+    escalation_guidance: 'Suggest escalation only where the failure pattern is not explained by ordinary
+      operational causes.
+
+      '
+    ai_boundaries: 'Do not conclude that failures indicate testing or illicit activity.
+
+      '

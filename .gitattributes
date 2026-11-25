@@ -1,0 +1,20 @@
+# Normalise line endings in the repository; check out with the platform default.
+* text=auto
+
+# Windows-only scripts keep CRLF.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Shell scripts must stay LF to run on macOS/Linux.
+*.sh text eol=lf
+
+# Binary files.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary

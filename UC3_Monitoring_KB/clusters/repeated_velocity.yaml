@@ -1,0 +1,35 @@
+# Business interpretation for the repeated velocity cluster.
+# Formation mechanics (match_on, thresholds, time window, same-programme) are in
+# ../config.yaml and are the engine's source of truth. Nothing is duplicated here.
+
+cluster_id: repeated_velocity
+version: 1.0.0
+engine_config: ../config.yaml  # match_on and thresholds live there, not here
+
+purpose: >
+  Show the analyst that several velocity alerts in one programme, close together
+  in time, may represent one reviewable pattern rather than several unrelated
+  investigations.
+
+relevant_categories:
+  - unusual_transaction_velocity
+
+interpretation_guidance: >
+  A concentration of velocity alerts within one programme has three ordinary
+  explanations before any adverse one: a segment of customers behaving similarly,
+  a baseline that no longer reflects the programme's normal activity, or a rule
+  threshold tuned for a different population. The cluster exists to make that
+  question askable at programme level; it does not answer it.
+
+analyst_guidance:
+  - Establish whether the alerts share customers or are spread across many.
+  - Compare the programme baseline against the activity now being seen.
+  - Consider whether rule configuration rather than customer behaviour explains the volume.
+  - Review the individual investigations; the cluster does not replace them.
+
+boundaries:
+  - A cluster is a grouping. It establishes a pattern, never wrongdoing.
+  - The cluster does not change any member alert's own category.
+  - The cluster does not produce an insufficient-evidence outcome; that is an
+    individual-alert concept only.
+  - Membership must not be presented to a customer or used as evidence of suspicion.

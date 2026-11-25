@@ -1,0 +1,77 @@
+{
+ "alerts": {
+  "ALRT-0038": {
+   "alert_id": "ALRT-0038",
+   "destination": "programme_operations",
+   "outcome": null,
+   "routed_at": "2026-10-05T06:38:30Z",
+   "seq": 0
+  },
+  "ALRT-0087": {
+   "alert_id": "ALRT-0087",
+   "destination": "monitoring_engineering",
+   "outcome": null,
+   "routed_at": "2026-10-05T12:04:14Z",
+   "seq": 4
+  },
+  "ALRT-0089": {
+   "alert_id": "ALRT-0089",
+   "destination": "kyb_cdd",
+   "outcome": null,
+   "routed_at": "2026-10-06T04:10:36Z",
+   "seq": 5
+  }
+ },
+ "clusters": {
+  "repeated_topup:ALRT-0010,ALRT-0011,ALRT-0012,ALRT-0013,ALRT-0014": {
+   "alert_ids": [
+    "ALRT-0010",
+    "ALRT-0011",
+    "ALRT-0012",
+    "ALRT-0013",
+    "ALRT-0014"
+   ],
+   "cluster_type": "repeated_topup",
+   "destination": "kyb_cdd",
+   "key": "repeated_topup:ALRT-0010,ALRT-0011,ALRT-0012,ALRT-0013,ALRT-0014",
+   "label": "Repeated Top-Up Pattern",
+   "outcome": null,
+   "routed_at": "2026-10-26T04:40:13Z",
+   "seq": 6
+  },
+  "repeated_velocity:ALRT-0001,ALRT-0002,ALRT-0003,ALRT-0004,ALRT-0005,ALRT-0006": {
+   "alert_ids": [
+    "ALRT-0001",
+    "ALRT-0002",
+    "ALRT-0003",
+    "ALRT-0004",
+    "ALRT-0005",
+    "ALRT-0006"
+   ],
+   "cluster_type": "repeated_velocity",
+   "destination": "programme_operations",
+   "key": "repeated_velocity:ALRT-0001,ALRT-0002,ALRT-0003,ALRT-0004,ALRT-0005,ALRT-0006",
+   "label": "Repeated Velocity Pattern",
+   "outcome": null,
+   "routed_at": "2026-10-05T09:20:33Z",
+   "seq": 1
+  },
+  "shared_counterparty_mcc:ALRT-0018,ALRT-0019,ALRT-0020,ALRT-0021,ALRT-0022": {
+   "alert_ids": [
+    "ALRT-0018",
+    "ALRT-0019",
+    "ALRT-0020",
+    "ALRT-0021",
+    "ALRT-0022"
+   ],
+   "cluster_type": "shared_counterparty_mcc",
+   "destination": "programme_operations",
+   "key": "shared_counterparty_mcc:ALRT-0018,ALRT-0019,ALRT-0020,ALRT-0021,ALRT-0022",
+   "label": "Shared Counterparty / Merchant Category Pattern",
+   "outcome": null,
+   "routed_at": "2026-10-05T12:02:28Z",
+   "seq": 3
+  }
+ },
+ "seq": 6
+}

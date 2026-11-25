@@ -1,0 +1,42 @@
+cluster_id: shared_counterparty_mcc
+version: 1.0.0
+engine_config: ../config.yaml  # match_on and thresholds live there, not here
+
+purpose: >
+  Group alerts that share a counterparty or merchant-category context, including
+  across different programmes, so a relationship invisible in any single alert
+  becomes reviewable.
+
+relevant_categories:
+  - linked_party_or_counterparty_review
+  - high_risk_merchant_category
+
+correlation_key:
+  field: shared_match_key
+  level: alert
+  meaning: >
+    An alert-level key expressing that this alert shares a counterparty or
+    merchant-category context with others. It is a relationship between alerts,
+    not a property of a customer.
+  null_behaviour: >
+    A null key means no shared grouping. Null keys never group together.
+  not_from_enrichment: >
+    The key arrives on the alert. It is never derived during enrichment, because
+    cluster detection must not wait for or depend on individual enrichment.
+
+interpretation_guidance: >
+  This is the only cluster that deliberately crosses programme boundaries, and it
+  is the one most easily over-read. Unrelated customers commonly share a
+  legitimate supplier, acquirer or advertising platform. Grouping establishes
+  that a shared context exists; it says nothing about why.
+
+analyst_guidance:
+  - Identify the shared counterparty or category and its share of each customer's activity.
+  - Establish whether it is a plausible common supplier for the industries involved.
+  - Check whether the member customers have any other connection.
+  - Note that members may sit in different programmes; that is expected here.
+
+boundaries:
+  - A cluster is a grouping. It establishes a pattern, never wrongdoing.
+  - Shared counterparties must not be described as evidence of connection for illicit purposes.
+  - The cluster does not change any member alert's own category.

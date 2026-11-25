@@ -1,0 +1,95 @@
+# Routing and cluster configuration.
+#
+# Routing is a deterministic lookup from the upstream rule_id. No model is
+# involved in deciding which playbook applies.
+#
+# Cluster definitions match on alert-level fields only, so cluster detection
+# never waits for individual enrichment. Thresholds live here, not in code:
+# changing one and re-running must recompute cluster membership rather than
+# read a stored label.
+
+version: kb-config-1.0.0-phase1
+
+routing:
+  TM-VEL-014:      unusual_transaction_velocity
+  TM-TOP-021:      unusual_topup_pattern
+  RG-GEO-031:      high_risk_geography_exposure
+  MC-RISK-041:     high_risk_merchant_category
+  KYB-FAIL-051:    repeated_failed_kyb_kyc_checks
+  SAN-PEP-061:     sanctions_pep_screening_review_required
+  CP-LINK-071:     linked_party_or_counterparty_review
+  AC-MISUSE-081:   possible_account_misuse
+  CARD-MISUSE-091: possible_card_misuse
+  TXN-FAIL-101:    repeated_failed_transaction_or_topup_pattern
+
+# programme_level_pattern has no rule_id by design: it is produced by the
+# cluster engine, never supplied upstream.
+
+# Evaluation order. An alert belongs to at most one cluster (cluster_ref is
+# singular), so definitions are evaluated in this order and an alert already
+# claimed by an earlier definition is skipped by later ones.
+cluster_evaluation_order:
+  - repeated_velocity
+  - repeated_topup
+  - shared_counterparty_mcc
+  - repeated_screening_review
+
+# Formation mechanics only. Business interpretation for each cluster is in
+# kb/clusters/<cluster_id>.yaml and is not duplicated here.
+clusters:
+
+  repeated_velocity:
+    label: Repeated Velocity Pattern
+    cluster_category: programme_level_pattern
+    match_on:
+      rule_ids: [TM-VEL-014]
+      group_by: [programme_ref]
+      same_programme: true
+    thresholds:
+      min_alerts: 5
+      min_customers: 3
+      time_window_hours: 48
+
+  repeated_topup:
+    label: Repeated Top-Up Pattern
+    cluster_category: programme_level_pattern
+    match_on:
+      rule_ids: [TM-TOP-021]
+      group_by: [programme_ref]
+      same_programme: true
+    thresholds:
+      min_alerts: 4
+      min_customers: 2
+      time_window_hours: 72
+
+  shared_counterparty_mcc:
+    label: Shared Counterparty / Merchant Category Pattern
+    cluster_category: programme_level_pattern
+    match_on:
+      rule_ids: [CP-LINK-071, MC-RISK-041]
+      group_by: [shared_match_key]
+      same_programme: false
+    thresholds:
+      min_alerts: 4
+      min_customers: 3
+      time_window_hours: 168
+
+  repeated_screening_review:
+    label: Repeated Screening Review Pattern
+    cluster_category: programme_level_pattern
+    match_on:
+      rule_ids: [SAN-PEP-061]
+      group_by: [programme_ref]
+      same_programme: true
+    thresholds:
+      min_alerts: 3
+      min_customers: 2
+      time_window_hours: 168
+
+investigation_outcomes:
+  - no_action_required
+  - information_requested
+  - escalate_to_mlro
+  - escalate_to_sanctions_analyst
+  - insufficient_evidence_manual_investigation_required
+  - pending

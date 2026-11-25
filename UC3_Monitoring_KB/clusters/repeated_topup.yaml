@@ -1,0 +1,28 @@
+cluster_id: repeated_topup
+version: 1.0.0
+engine_config: ../config.yaml  # match_on and thresholds live there, not here
+
+purpose: >
+  Surface repeated top-up review delays concentrated in one programme, where the
+  operational effect on customers may be wider than any single alert shows.
+
+relevant_categories:
+  - unusual_topup_pattern
+
+interpretation_guidance: >
+  Repeated top-up alerts in one programme often indicate a funding pattern common
+  to that programme's customers rather than individual behaviour. Because top-up
+  review can leave funds unavailable, a concentration here has a customer-impact
+  dimension that other clusters do not.
+
+analyst_guidance:
+  - Determine whether the pattern is customer-specific, programme-level or rule-configuration related.
+  - Check how many member alerts carry a current customer impact such as a delayed top-up.
+  - Review funding-source spread across the member customers.
+  - Treat any customer communication as a separate human-owned workflow.
+
+boundaries:
+  - A cluster is a grouping. It establishes a pattern, never wrongdoing.
+  - No customer-facing wording, suspicion reasoning or notice may be drafted here.
+  - The cluster does not release, hold or otherwise affect funds.
+  - The cluster does not change any member alert's own category.

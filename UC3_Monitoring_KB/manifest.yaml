@@ -1,0 +1,126 @@
+# UC3 Monitoring Alert Triage — Phase 1 Knowledge Base manifest.
+#
+# Describes the KB. Does not duplicate playbook, tool or cluster definitions:
+# each lives in exactly one file and this manifest points at it.
+
+kb_name: uc3-monitoring-alert-triage-kb
+kb_version: 1.0.1-phase1
+kb_description: >
+  Procedure layer for the UC3 monitoring alert triage POC. Supplies investigation
+  procedure, evidence requirements, outcome restrictions and model boundaries.
+  Contains no customer facts: those come from the canonical data via the tools.
+
+phase: 1
+status: complete-for-phase-1
+
+files:
+  playbooks:
+    path: playbooks.yaml
+    version: kb-playbooks-1.0.1-phase1
+    contains: >
+      Ten individual alert playbooks, the global AI boundary block, and the
+      evidence-to-tool mapping each playbook requires.
+  tools:
+    path: tools.yaml
+    version: kb-tools-0.1.0
+    contains: >
+      Contracts for the ten data-access tools: arguments, returned fields and the
+      rule that an absent value is returned as MISSING rather than an error.
+  configuration:
+    path: config.yaml
+    version: kb-config-1.0.0-phase1
+    contains: >
+      Deterministic rule-ID routing, the global investigation outcome enum, and
+      the cluster formation mechanics the engine consumes.
+  cluster_interpretation:
+    path: clusters/
+    version: kb-clusters-1.0.0-phase1
+    contains: >
+      Business-level interpretation for each cluster type. Formation mechanics
+      are not here; they are in config.yaml.
+
+access_model:
+  routing: deterministic dictionary lookup, rule_id -> playbook_id
+  retrieval: >
+    None. The KB is small enough that direct lookup is sufficient and correct.
+    No vector store, no embeddings, no semantic search, no retrieval agent.
+    Retrieval inside a selected playbook may be reconsidered only if playbooks
+    grow into long documents in a later phase.
+  loading: >
+    The engine loads playbooks.yaml, tools.yaml and config.yaml at construction
+    and reads routing, playbooks and outcomes from them. No playbook information
+    is duplicated in Python.
+
+supported_categories:
+  - unusual_transaction_velocity
+  - unusual_topup_pattern
+  - high_risk_geography_exposure
+  - high_risk_merchant_category
+  - repeated_failed_kyb_kyc_checks
+  - sanctions_pep_screening_review_required
+  - linked_party_or_counterparty_review
+  - possible_account_misuse
+  - possible_card_misuse
+  - repeated_failed_transaction_or_topup_pattern
+
+supported_cluster_types:
+  - repeated_velocity
+  - repeated_topup
+  - shared_counterparty_mcc
+  - repeated_screening_review
+
+programme_level_pattern:
+  produced_by: cluster engine
+  upstream_rule_id: none
+  note: >
+    programme_level_pattern is a cluster-level category. It has no upstream rule
+    ID and no individual playbook, and must never be created as one.
+
+correlation_keys:
+  shared_match_key:
+    level: alert
+    meaning: >
+      An alert-level correlation key indicating that this alert shares a
+      counterparty or merchant-category context with other alerts. It expresses a
+      relationship between alerts, not a property of a customer.
+    populated_for_categories:
+      - linked_party_or_counterparty_review
+      - high_risk_merchant_category
+    populated_for_rules:
+      - CP-LINK-071
+      - MC-RISK-041
+    used_by_cluster: shared_counterparty_mcc
+    null_behaviour: >
+      A null key means the alert takes part in no shared-counterparty grouping.
+      Null keys are skipped by the cluster engine and can never group together.
+    not_obtained_by_enrichment: >
+      The key arrives on the alert record from upstream. It is never derived
+      during enrichment, because cluster detection must not depend on enrichment.
+    population_logic_owner: >
+      Whoever supplies the alert data. For the demo this is the dataset
+      generator. The KB states which categories may carry a key; it does not
+      compute one.
+
+schema_reference:
+  classified_schema: derived_schema.json
+  built_by: build_schema.py
+  canonical_source: UC3 scope brief section 8
+  classes: [canonical, evidence, join, ui, system_output]
+
+phase_1_exclusions:
+  note: >
+    Recorded so the exclusion stays visible rather than being silently
+    reintroduced. Each is a locked decision, not an oversight.
+  priority: deferred to Phase 2; no scoring, ranking, thresholds or ordering
+  risk_rating: not generated unless a playbook requires it
+  jurisdiction: alert-level jurisdiction and legal entity out of scope
+  card_ref_masked: masked card reference and PCI card handling out of scope
+  risk_band: not a required core POC field
+  alert_status: not a required core POC field
+  alert_age_days: not a required core POC field
+  amount_bands: not required core POC fields
+  clarification: >
+    Programme and counterparty attributes such as high_risk_jurisdictions and
+    counterparty_jurisdictions are legitimate evidence fields. They are not the
+    excluded alert-level jurisdiction field and must not be removed by name
+    similarity.

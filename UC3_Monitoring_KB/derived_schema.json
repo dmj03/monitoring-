@@ -1,0 +1,469 @@
+{
+  "schema_version": "uc3-classified-0.2.0",
+  "canonical_source": "UC3 scope brief section 8",
+  "note": "Five classes. A field is valid if it appears in any of them. Join keys are canonical and are not evidence: no playbook requests an identifier as an evidence item because tools take them as arguments.",
+  "objects": {
+    "Customer": {
+      "canonical": [
+        "beneficial_owner_status",
+        "business_name_placeholder",
+        "country",
+        "customer_ref",
+        "entity_type",
+        "industry_segment",
+        "kyb_status",
+        "kyc_status",
+        "onboarding_date",
+        "open_case_count"
+      ],
+      "evidence": [
+        "beneficial_owner_status",
+        "country",
+        "entity_type",
+        "industry_segment",
+        "kyb_status",
+        "kyc_status",
+        "onboarding_date",
+        "open_case_count",
+        "source_of_funds"
+      ],
+      "join": [
+        "customer_ref",
+        "programme_ref"
+      ],
+      "ui": [
+        "business_name_placeholder"
+      ],
+      "canonical_excluded_by_locked_decision": [
+        "last_review_date",
+        "previous_alert_count",
+        "risk_rating"
+      ],
+      "all_valid": [
+        "beneficial_owner_status",
+        "business_name_placeholder",
+        "country",
+        "customer_ref",
+        "entity_type",
+        "industry_segment",
+        "kyb_status",
+        "kyc_status",
+        "onboarding_date",
+        "open_case_count",
+        "programme_ref",
+        "source_of_funds"
+      ]
+    },
+    "Programme": {
+      "canonical": [],
+      "evidence": [
+        "high_risk_jurisdictions",
+        "monitored_merchant_categories",
+        "programme_topup_baseline",
+        "programme_transaction_baseline"
+      ],
+      "join": [
+        "programme_ref"
+      ],
+      "ui": [
+        "active_customer_count",
+        "partner_type",
+        "primary_jurisdiction",
+        "programme_name_placeholder"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "active_customer_count",
+        "high_risk_jurisdictions",
+        "monitored_merchant_categories",
+        "partner_type",
+        "primary_jurisdiction",
+        "programme_name_placeholder",
+        "programme_ref",
+        "programme_topup_baseline",
+        "programme_transaction_baseline"
+      ]
+    },
+    "TransactionSummary": {
+      "canonical": [
+        "customer_ref",
+        "failed_transaction_count",
+        "top_country_exposure",
+        "top_merchant_category",
+        "topup_count",
+        "transaction_count"
+      ],
+      "evidence": [
+        "card_not_present_count",
+        "card_present_count",
+        "customer_transaction_baseline",
+        "declined_transaction_count",
+        "distinct_country_count",
+        "distinct_merchant_category_count",
+        "failed_transaction_count",
+        "high_risk_country_transaction_count",
+        "monitored_mcc_transaction_count",
+        "top_country_exposure",
+        "top_merchant_category",
+        "transaction_count"
+      ],
+      "join": [
+        "customer_ref"
+      ],
+      "ui": [
+        "average_amount",
+        "total_amount"
+      ],
+      "canonical_excluded_by_locked_decision": [
+        "average_transaction_size",
+        "historical_baseline_ref",
+        "new_counterparty_flag",
+        "period_end",
+        "period_start",
+        "top-up_value_band",
+        "transaction_value_band",
+        "unusual_velocity_flag"
+      ],
+      "all_valid": [
+        "average_amount",
+        "card_not_present_count",
+        "card_present_count",
+        "customer_ref",
+        "customer_transaction_baseline",
+        "declined_transaction_count",
+        "distinct_country_count",
+        "distinct_merchant_category_count",
+        "failed_transaction_count",
+        "high_risk_country_transaction_count",
+        "monitored_mcc_transaction_count",
+        "top_country_exposure",
+        "top_merchant_category",
+        "topup_count",
+        "total_amount",
+        "transaction_count"
+      ]
+    },
+    "Transaction": {
+      "canonical": [],
+      "evidence": [
+        "transaction_id"
+      ],
+      "join": [
+        "counterparty_ref",
+        "customer_ref",
+        "programme_ref"
+      ],
+      "ui": [
+        "amount",
+        "channel",
+        "country",
+        "currency",
+        "merchant_category",
+        "timestamp",
+        "transaction_status",
+        "transaction_type"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "amount",
+        "channel",
+        "counterparty_ref",
+        "country",
+        "currency",
+        "customer_ref",
+        "merchant_category",
+        "programme_ref",
+        "timestamp",
+        "transaction_id",
+        "transaction_status",
+        "transaction_type"
+      ]
+    },
+    "TopUpSummary": {
+      "canonical": [],
+      "evidence": [
+        "customer_impact",
+        "customer_impact_type",
+        "customer_topup_baseline",
+        "delayed_topup_count",
+        "distinct_funding_source_count",
+        "failed_topup_count",
+        "topup_count"
+      ],
+      "join": [
+        "customer_ref"
+      ],
+      "ui": [
+        "topup_average_amount",
+        "topup_total_amount"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "customer_impact",
+        "customer_impact_type",
+        "customer_ref",
+        "customer_topup_baseline",
+        "delayed_topup_count",
+        "distinct_funding_source_count",
+        "failed_topup_count",
+        "topup_average_amount",
+        "topup_count",
+        "topup_total_amount"
+      ]
+    },
+    "TopUp": {
+      "canonical": [],
+      "evidence": [
+        "topup_id"
+      ],
+      "join": [
+        "customer_ref",
+        "funding_source_ref",
+        "programme_ref"
+      ],
+      "ui": [
+        "amount",
+        "currency",
+        "delay_reason",
+        "timestamp",
+        "topup_status"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "amount",
+        "currency",
+        "customer_ref",
+        "delay_reason",
+        "funding_source_ref",
+        "programme_ref",
+        "timestamp",
+        "topup_id",
+        "topup_status"
+      ]
+    },
+    "Screening": {
+      "canonical": [
+        "customer_ref",
+        "last_screened_at",
+        "list_type",
+        "match_confidence_band",
+        "match_status",
+        "review_required",
+        "screening_ref",
+        "screening_type"
+      ],
+      "evidence": [
+        "last_screened_at",
+        "list_type",
+        "match_confidence_band",
+        "match_status",
+        "previous_screening_review_count",
+        "review_required",
+        "screening_type"
+      ],
+      "join": [
+        "customer_ref",
+        "screening_ref"
+      ],
+      "ui": [],
+      "canonical_excluded_by_locked_decision": [
+        "analyst_action"
+      ],
+      "all_valid": [
+        "customer_ref",
+        "last_screened_at",
+        "list_type",
+        "match_confidence_band",
+        "match_status",
+        "previous_screening_review_count",
+        "review_required",
+        "screening_ref",
+        "screening_type"
+      ]
+    },
+    "KybHistory": {
+      "canonical": [],
+      "evidence": [
+        "beneficial_owner_verification_attempts",
+        "corporate_structure_available",
+        "failed_kyb_check_count",
+        "last_kyb_failure_reason",
+        "outstanding_documents"
+      ],
+      "join": [
+        "customer_ref"
+      ],
+      "ui": [
+        "kyb_check_count",
+        "last_kyb_check_at"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "beneficial_owner_verification_attempts",
+        "corporate_structure_available",
+        "customer_ref",
+        "failed_kyb_check_count",
+        "kyb_check_count",
+        "last_kyb_check_at",
+        "last_kyb_failure_reason",
+        "outstanding_documents"
+      ]
+    },
+    "CounterpartySummary": {
+      "canonical": [],
+      "evidence": [
+        "counterparty_jurisdictions",
+        "distinct_counterparty_count",
+        "new_counterparty_count",
+        "shared_counterparty_refs",
+        "top_counterparty_ref",
+        "top_counterparty_share"
+      ],
+      "join": [
+        "customer_ref"
+      ],
+      "ui": [],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "counterparty_jurisdictions",
+        "customer_ref",
+        "distinct_counterparty_count",
+        "new_counterparty_count",
+        "shared_counterparty_refs",
+        "top_counterparty_ref",
+        "top_counterparty_share"
+      ]
+    },
+    "PriorAlerts": {
+      "canonical": [],
+      "evidence": [
+        "prior_alert_count"
+      ],
+      "join": [
+        "customer_ref"
+      ],
+      "ui": [
+        "last_prior_alert_at",
+        "prior_alert_categories",
+        "prior_alert_refs",
+        "prior_outcome_summary"
+      ],
+      "canonical_excluded_by_locked_decision": [],
+      "all_valid": [
+        "customer_ref",
+        "last_prior_alert_at",
+        "prior_alert_categories",
+        "prior_alert_count",
+        "prior_alert_refs",
+        "prior_outcome_summary"
+      ]
+    },
+    "Alert": {
+      "canonical": [
+        "alert_id",
+        "created_at",
+        "customer_ref",
+        "programme_ref",
+        "rule_id"
+      ],
+      "evidence": [],
+      "join": [
+        "alert_id",
+        "cluster_ref",
+        "customer_ref",
+        "programme_ref",
+        "shared_match_key"
+      ],
+      "ui": [],
+      "canonical_excluded_by_locked_decision": [
+        "account_ref",
+        "alert_age_days",
+        "alert_source",
+        "alert_status",
+        "alert_type",
+        "business_ref",
+        "card_ref_masked",
+        "jurisdiction",
+        "priority",
+        "risk_band"
+      ],
+      "all_valid": [
+        "alert_id",
+        "cluster_ref",
+        "created_at",
+        "customer_ref",
+        "programme_ref",
+        "rule_id",
+        "shared_match_key"
+      ]
+    }
+  },
+  "system_output_objects": {
+    "TriageResult": [
+      "category (deterministic: rule_id or cluster)",
+      "rationale",
+      "checklist",
+      "recommended_outcome",
+      "model_ref",
+      "prompt_version",
+      "playbook_pack_version"
+    ],
+    "EvidencePack": [
+      "evidence[] (key, status FOUND|MISSING, value, source)",
+      "missing_evidence",
+      "tool_calls",
+      "playbook_refs",
+      "investigation_focus"
+    ],
+    "Cluster": [
+      "cluster_ref",
+      "cluster_type",
+      "label",
+      "cluster_category",
+      "alert_ids",
+      "customer_refs",
+      "programme_refs",
+      "rule_ids",
+      "time_span_hours",
+      "thresholds"
+    ],
+    "HumanReview": [
+      "decision",
+      "corrected_category",
+      "approved_rationale",
+      "final_outcome",
+      "escalated_to"
+    ],
+    "AuditEvent": [
+      "occurred_at",
+      "actor_type",
+      "actor_ref",
+      "action",
+      "object_id"
+    ]
+  },
+  "excluded_by_locked_decision": {
+    "priority": "priority deferred to Phase 2",
+    "jurisdiction": "jurisdiction / legal entity out of scope",
+    "card_ref_masked": "masked card reference / PCI card handling out of scope",
+    "risk_band": "not a required core POC field",
+    "alert_status": "not a required core POC field",
+    "alert_age_days": "not a required core POC field (derivable from created_at)",
+    "transaction_value_band": "amount band not a required core POC field",
+    "top-up_value_band": "amount band not a required core POC field",
+    "average_transaction_size": "amount band not a required core POC field",
+    "risk_rating": "not generated unless a playbook requires it",
+    "alert_source": "rule_id carries the routing signal in this POC",
+    "alert_type": "category is derived from rule_id, not supplied upstream",
+    "business_ref": "not used by any playbook or cluster rule",
+    "account_ref": "not used by any playbook or cluster rule",
+    "previous_alert_count": "superseded by the get_prior_alerts tool",
+    "last_review_date": "not used by any playbook",
+    "period_start": "window is a tool argument, not a stored field",
+    "period_end": "window is a tool argument, not a stored field",
+    "unusual_velocity_flag": "playbooks compare counts against two baselines instead",
+    "new_counterparty_flag": "superseded by get_counterparty_summary.new_counterparty_count",
+    "historical_baseline_ref": "baselines are carried as values, not references",
+    "analyst_action": "set at review time, not supplied as input"
+  }
+}

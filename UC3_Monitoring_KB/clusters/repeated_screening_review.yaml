@@ -1,0 +1,27 @@
+cluster_id: repeated_screening_review
+version: 1.0.0
+engine_config: ../config.yaml  # match_on and thresholds live there, not here
+
+purpose: >
+  Group repeated screening review flags within one programme so they can be
+  routed to a sanctions analyst together, with the queue position visible.
+
+relevant_categories:
+  - sanctions_pep_screening_review_required
+
+interpretation_guidance: >
+  A concentration of screening reviews in one programme may reflect the customer
+  population, the screening configuration, or name-matching characteristics of a
+  jurisdiction. None of those is assessed here. The cluster is a routing and
+  workload view over reviews that each remain individually owned.
+
+analyst_guidance:
+  - Route the grouped reviews to a sanctions analyst under the approved process.
+  - Note how many member alerts are still awaiting manual confirmation.
+  - Review each member alert individually; screening decisions are per customer.
+
+boundaries:
+  - A cluster is a grouping. It establishes a pattern, never wrongdoing.
+  - The cluster assesses no match, confirms no match and dismisses no match.
+  - No sanctions or PEP decision is made at cluster level.
+  - Grouping must never be read as corroboration between unrelated screening matches.
