@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getHealth } from "../api/health";
 import { ApiError, NetworkError } from "../api/client";
 import type { Health } from "../api/types";
-import { getPreference, initTheme, setPreference, type ThemePref } from "../theme/theme";
+import { getAppliedTheme, initTheme, setPreference, type Theme } from "../theme/theme";
 
 export function Loading({ what }: { what: string }) {
   return (
@@ -85,13 +85,14 @@ function crumbFor(path: string): string {
   return "Alerts";
 }
 
-/** Light / Dark / System switch from the shared theme kit, at the bottom of the sidebar. */
+/** Light / Dark switch at the bottom of the sidebar. Until the analyst picks one the
+ *  app follows the OS, and the button for the theme on screen shows as pressed. */
 function ThemeToggle() {
-  const [pref, setPref] = useState<ThemePref>(getPreference);
-  useEffect(() => initTheme(() => setPref(getPreference())), []);
-  const choose = (p: ThemePref) => {
-    setPreference(p);
-    setPref(p);
+  const [theme, setTheme] = useState<Theme>(getAppliedTheme);
+  useEffect(() => initTheme(() => setTheme(getAppliedTheme())), []);
+  const choose = (t: Theme) => {
+    setPreference(t);
+    setTheme(t);
   };
   return (
     <div className="theme-toggle" role="group" aria-label="Colour theme">
@@ -99,10 +100,9 @@ function ThemeToggle() {
         [
           ["light", "Light"],
           ["dark", "Dark"],
-          ["system", "System"],
         ] as const
-      ).map(([p, label]) => (
-        <button key={p} type="button" aria-pressed={pref === p} onClick={() => choose(p)}>
+      ).map(([t, label]) => (
+        <button key={t} type="button" aria-pressed={theme === t} onClick={() => choose(t)}>
           {label}
         </button>
       ))}

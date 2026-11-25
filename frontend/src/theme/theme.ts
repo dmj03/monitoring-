@@ -2,7 +2,10 @@
 // The pre-paint script in index.html sets data-theme before first render; this
 // keeps it in step with the analyst's choice, the OS setting and other tabs.
 
-export type ThemePref = "light" | "dark" | "system";
+// "system" is never offered in the UI: it is the default until the analyst picks
+// Light or Dark, and simply means "follow the OS".
+export type Theme = "light" | "dark";
+export type ThemePref = Theme | "system";
 
 const KEY = "ds-theme";
 // jsdom (the test environment) has no matchMedia; treat that as "OS is light".
@@ -19,9 +22,15 @@ export function getPreference(): ThemePref {
   return "system";
 }
 
+/** The theme actually on screen, whether chosen or inherited from the OS. */
+export function getAppliedTheme(): Theme {
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+}
+
 function apply(pref: ThemePref) {
-  const theme = pref === "system" ? (media && !media.matches ? "dark" : "light") : pref;
   const root = document.documentElement;
+  if (pref === "system" && !media && root.hasAttribute("data-theme")) return; // can't read the OS: keep what's set
+  const theme = pref === "system" ? (media && !media.matches ? "dark" : "light") : pref;
   if (root.getAttribute("data-theme") === theme) return;
   root.classList.add("ds-theme-switching"); // swap every component at once
   root.setAttribute("data-theme", theme);
@@ -44,7 +53,10 @@ export function setPreference(pref: ThemePref) {
 export function initTheme(onChange?: () => void): () => void {
   apply(getPreference());
   const onMedia = () => {
-    if (getPreference() === "system") apply("system");
+    if (getPreference() === "system") {
+      apply("system");
+      onChange?.();
+    }
   };
   const onStorage = (e: StorageEvent) => {
     if (e.key === KEY) {
